@@ -1,10 +1,10 @@
 import altair as alt
 import streamlit as st
-import pandas as pd
+import pandas as pd 
 
 df = pd.read_csv('annual_generation_state.csv')
 
-st.title('US Energy Generation')
+st.title('US Energy Generation') 
 
 df['STATE'] = df['STATE'].astype(str)
 df['GENERATION (Megawatthours)'] = df['GENERATION (Megawatthours)'].astype(str)
