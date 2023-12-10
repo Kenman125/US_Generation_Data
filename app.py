@@ -64,26 +64,38 @@ def energy_mix_over_time():
 
     # Filter the DataFrame based on the selected state
     if selected_state != 'Select':
-        # Exclude "Total" energy source
-        energy_mix_df = df[(df["STATE"] == selected_state) & (df["ENERGY SOURCE"] != "Total")]
+        # Exclude specified energy sources
+        excluded_sources = ["Total","Other", "Other Biomass", "Other Gases"]
+        energy_mix_df = df[(df["STATE"] == selected_state) & (~df["ENERGY SOURCE"].isin(excluded_sources))]
 
         # Apply the constant filter for "TYPE OF PRODUCER"
-        energy_mix_df = energy_mix_df[energy_mix_df["TYPE OF PRODUCER"] == "Total Electric Power Industry"]
+        energy_mix_df = energy_mix_df[
+            energy_mix_df["TYPE OF PRODUCER"] == "Total Electric Power Industry"
+        ]
 
-        # Create Altair chart for the horizontal stacked bar chart
-        bar_chart = alt.Chart(energy_mix_df).mark_bar().encode(
-            x=alt.X('YEAR:O', title='Year'),
-            y=alt.Y('GENERATION (Megawatthours):Q', stack='normalize', title='Generation (MWh)'),
-            color='ENERGY SOURCE:N',
-            tooltip=['ENERGY SOURCE:N', 'GENERATION (Megawatthours):Q']
-        ).properties(
-            width=600,
-            height=400,
-            title=f'Energy Mix Over Time - {selected_state}'
-        )
+        # Check if the filtered DataFrame is not empty
+        if not energy_mix_df.empty:
+            # Create Altair chart for the horizontal stacked bar chart
+            bar_chart = alt.Chart(energy_mix_df).mark_bar().encode(
+                x=alt.X("YEAR:O", title="Year"),
+                y=alt.Y(
+                    "GENERATION (Megawatthours):Q",
+                    stack="normalize",
+                    title="Generation (MWh)",
+                ),
+                color="ENERGY SOURCE:N",
+                tooltip=["ENERGY SOURCE:N", "GENERATION (Megawatthours):Q"],
+            ).properties(
+                width=600,
+                height=400,
+                title=f"Energy Mix Over Time - {selected_state}",
+            )
 
-        # Display the Altair chart
-        st.altair_chart(bar_chart, use_container_width=True)
+            # Display the Altair chart
+            st.altair_chart(bar_chart, use_container_width=True)
+        else:
+            st.info(f"No data available for {selected_state}.")
+
     else:
         st.info("Please select a state.")
 
