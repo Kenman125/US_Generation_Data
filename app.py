@@ -33,22 +33,27 @@ def generation_over_time():
         if selected_source != 'Select':
             filtered_df = filtered_df[filtered_df["ENERGY SOURCE"] == selected_source]
 
-        # Compute the total production for the selected state using the maximum value
-        total_production = filtered_df["GENERATION (Megawatthours)"].max()
+        # Check if the filtered DataFrame is not empty
+        if not filtered_df.empty:
+            # Compute the total production for the selected state using the maximum value
+            total_production = filtered_df["GENERATION (Megawatthours)"].max()
 
-        # Create Altair chart
-        line_chart = alt.Chart(filtered_df).mark_line().encode(
-            x='YEAR:O',
-            y=alt.Y('GENERATION (Megawatthours):Q', title='Generation (MWh)', axis=alt.Axis(format=',d'), scale=alt.Scale(domain=[0, total_production])),
-            tooltip=['YEAR:O', 'GENERATION (Megawatthours):Q']
-        ).properties(
-            width=600,
-            height=400,
-            title=f'Generation Over Time - {selected_state}'
-        )
+            # Create Altair chart
+            line_chart = alt.Chart(filtered_df).mark_line().encode(
+                x='YEAR:O',
+                y=alt.Y('GENERATION (Megawatthours):Q', title='Generation (MWh)', axis=alt.Axis(format=',d'), scale=alt.Scale(domain=[0, total_production])),
+                tooltip=['YEAR:O', 'GENERATION (Megawatthours):Q']
+            ).properties(
+                width=600,
+                height=400,
+                title=f'Generation Over Time - {selected_state}'
+            )
 
-        # Display the Altair chart
-        st.altair_chart(line_chart, use_container_width=True)
+            # Display the Altair chart
+            st.altair_chart(line_chart, use_container_width=True)
+        else:
+            st.info(f"No data available for {selected_state} and {selected_source}.")
+
     else:
         st.info("Please select a state.")
 
